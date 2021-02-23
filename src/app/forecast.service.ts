@@ -12,6 +12,9 @@ export class ForecastService {
 
   constructor(private httpClient: HttpClient) { }
 
+  /**
+   * All available unique city names
+   */
   getCityNames(): Observable<string[]> {
     return of([]);
   }
