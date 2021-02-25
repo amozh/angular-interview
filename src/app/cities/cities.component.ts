@@ -19,11 +19,4 @@ export class CitiesComponent implements OnInit {
     });
   }
 
-  printableCities(): string {
-    if (this.allCityForecasts.length) {
-      return JSON.stringify(this.allCityForecasts, null, 2);
-    }
-    return '';
-  }
-
 }

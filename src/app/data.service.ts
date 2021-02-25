@@ -7,6 +7,7 @@ export interface IForecast {
   tempCelsius: number;
   humidityPercent: number;
   windSpeed: number;
+  weather: 'sunny' | 'cloudy' | 'raining';
 }
 
 export interface ICityForecast {
@@ -23,71 +24,76 @@ export class DataService  implements InMemoryDbService {
   constructor() { }
 
   createDb(reqInfo?: RequestInfo): { forecasts: ICityForecast[] } {
+    const generator = new ForecastGenerator();
     const forecasts =  [
-      H.nextCityForecast('Kyiv'),
-      H.nextCityForecast('Kyiv'),
-      H.nextCityForecast('Kyiv'),
-      H.nextCityForecast('Kyiv'),
-      H.nextCityForecast('London'),
-      H.nextCityForecast('London'),
-      H.nextCityForecast('London'),
-      H.nextCityForecast('London'),
-      H.nextCityForecast('Paris'),
-      H.nextCityForecast('Paris'),
-      H.nextCityForecast('Paris'),
-      H.nextCityForecast('Paris')
+      generator.nextCityForecast('Kyiv'),
+      generator.nextCityForecast('Kyiv'),
+      generator.nextCityForecast('Kyiv'),
+      generator.nextCityForecast('Kyiv'),
+      generator.nextCityForecast('London'),
+      generator.nextCityForecast('London'),
+      generator.nextCityForecast('London'),
+      generator.nextCityForecast('London'),
+      generator.nextCityForecast('Paris'),
+      generator.nextCityForecast('Paris'),
+      generator.nextCityForecast('Paris'),
+      generator.nextCityForecast('Paris')
     ];
 
     return { forecasts };
   }
 }
 
-class H {
-  static lastId = 1;
-  static lastDateByCity: {[key: string]: Date} = {};
+class ForecastGenerator {
+  private lastId = 1;
+  private lastDateByCity: {[key: string]: Date} = {};
 
-  static nextCityForecast(desiredCityName: string): ICityForecast {
+  nextCityForecast(desiredCityName: string): ICityForecast {
     return {
-      id:  H.lastId++,
+      id:  this.lastId++,
       cityName: desiredCityName,
-      date: H.nextDate(desiredCityName),
-      forecastsByHour: H.randomForcastsByHour()
+      date: this.nextDate(desiredCityName),
+      forecastsByHour: this.randomForcastsByHour()
     };
   }
 
-  static nextDate(cityName: string): Date {
-    const lastDate = H.lastDateByCity[cityName];
+  private nextDate(cityName: string): Date {
+    const lastDate = this.lastDateByCity[cityName];
     let nextDate: Date;
     if (lastDate) {
       nextDate = new Date(lastDate);
       nextDate.setHours(lastDate.getHours() + 24);
     } else {
-      nextDate = new Date();
+      nextDate = new Date(this.getRandomInt(2099), this.getRandomInt(12) + 1);
     }
-    H.lastDateByCity[cityName] = nextDate;
+    this.lastDateByCity[cityName] = nextDate;
     return nextDate;
   }
 
-  static randomForcastsByHour(): {[key: number]: IForecast} {
+  private randomForcastsByHour(): {[key: number]: IForecast} {
     return {
-      2: H.randomForecast(),
-      5: H.randomForecast(),
-      10: H.randomForecast(),
-      15: H.randomForecast(),
-      20: H.randomForecast(),
-      23: H.randomForecast()
+      2: this.randomForecast(),
+      5: this.randomForecast(),
+      10: this.randomForecast(),
+      15: this.randomForecast(),
+      20: this.randomForecast(),
+      23: this.randomForecast()
     };
   }
 
-  static randomForecast(): IForecast {
+  private randomForecast(): IForecast {
     return {
-      tempCelsius: H.getRandomInt(50),
-      humidityPercent: H.getRandomInt(100),
-      windSpeed: H.getRandomInt(20)
+      tempCelsius: this.getRandomInt(50),
+      humidityPercent: this.getRandomInt(100),
+      windSpeed: this.getRandomInt(20),
+      weather: ['sunny', 'cloudy', 'raining'][this.getRandomInt(3)] as any
     };
   }
 
-  static getRandomInt(max: number): number {
+  /**
+   * 0 is included, max is excluded
+   */
+  private getRandomInt(max: number): number {
     return Math.floor(Math.random() * Math.floor(max));
   }
 }

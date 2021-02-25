@@ -1,6 +1,6 @@
 # Cities view
 The user should have a page/route where they can manage their locations
-  * Ability to search for and save a city to dashboard
+  * Ability to search for a city using autocomplete
   * Ability to see current conditions and today's forecast for found city
   * Ability to save city to dashboard
 
